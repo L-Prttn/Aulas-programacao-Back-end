@@ -39,7 +39,7 @@ CREATE TABLE quartos (
         REFERENCES tipos_quartos (id)
         ON DELETE RESTRICT,
     CONSTRAINT ck_quartos_situacao
-        CHECK (situacao IN ('Disponível', 'Ocupado', 'Manutenção', 'Inativo', 'Reservado')),
+        CHECK (situacao IN ('Disponível', 'Manutenção', 'Inativo')),
     CONSTRAINT ck_quartos_capacidade
         CHECK (capacidade > 0),
     CONSTRAINT ck_quartos_valor_diaria
@@ -133,3 +133,5 @@ CREATE EXTENSION IF NOT EXISTS btree_gist;
         daterange(data_entrada, data_saida, '[)') WITH &&
     )
     WHERE (situacao <> 'Cancelado');
+
+COMMIT;
