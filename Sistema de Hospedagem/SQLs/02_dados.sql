@@ -1,98 +1,327 @@
+-- ============================================================================
+-- MASSA DE DADOS
+-- Sistema de Gestão de Hotel/Pousada
+-- ============================================================================
+
+BEGIN;
+
+SET search_path TO hotel_pousada;
 
 -- ============================================================================
--- 2. MASSA DE DADOS
+-- 1. HÓSPEDES
 -- ============================================================================
 
-INSERT INTO categorias (id, nome, descricao) VALUES
-    (1, 'Eletrônicos', 'Dispositivos e periféricos eletrônicos.'),
-    (2, 'Acessórios', 'Cabos, carregadores e itens complementares.'),
-    (3, 'Livros', 'Livros técnicos e de desenvolvimento.'),
-    (4, 'Casa e Escritório', 'Itens para estudo, trabalho e organização.'),
-    (5, 'Saúde e Bem-estar', 'Produtos para rotina e atividades físicas.'),
-    (6, 'Games', 'Categoria criada sem produtos para praticar LEFT JOIN.');
+INSERT INTO hospedes (id, nome, cpf, telefone, email) VALUES
+(1, 'Ana Beatriz Souza', '12345678901', '(54) 99911-2233', 'ana.souza@email.com'),
+(2, 'Bruno Henrique Lima', '23456789012', '(54) 99822-3344', 'bruno.lima@email.com'),
+(3, 'Carolina Mendes', '34567890123', '(54) 99733-4455', 'carolina.mendes@email.com'),
+(4, 'Daniel Oliveira', '45678901234', '(54) 99644-5566', 'daniel.oliveira@email.com'),
+(5, 'Eduarda Martins', '56789012345', '(54) 99555-6677', 'eduarda.martins@email.com'),
+(6, 'Felipe Rodrigues', '67890123456', '(54) 99466-7788', 'felipe.rodrigues@email.com'),
+(7, 'Gabriela Fernandes', '78901234567', '(54) 99377-8899', 'gabriela.fernandes@email.com'),
+(8, 'Henrique Costa', '89012345678', '(54) 99288-9900', 'henrique.costa@email.com'),
+(9, 'Isabela Pereira', '90123456789', '(54) 99199-0011', 'isabela.pereira@email.com'),
+(10, 'João Pedro Almeida', '01234567890', '(54) 99000-1122', 'joao.almeida@email.com');
 
-INSERT INTO produtos (id, categoria_id, nome, sku, preco, estoque, ativo) VALUES
-    (1, 1, 'Fone Bluetooth Pro', 'FONE-BT-PRO', 299.90, 25, TRUE),
-    (2, 4, 'Teclado Mecânico', 'TEC-MEC-001', 349.90, 12, TRUE),
-    (3, 2, 'Mouse Sem Fio', 'MOUSE-SF-001', 119.90, 42, TRUE),
-    (4, 1, 'Webcam Full HD', 'WEBCAM-FHD', 249.90, 9, TRUE),
-    (5, 4, 'Suporte para Notebook', 'SUP-NOTE-001', 89.90, 30, TRUE),
-    (6, 3, 'Livro: Clean Code', 'BOOK-CLEAN', 159.90, 18, TRUE),
-    (7, 2, 'Cabo HDMI 2m', 'CABO-HDMI-2M', 39.90, 0, FALSE),
-    (8, 1, 'Monitor 24 Polegadas', 'MON-24-IPS', 899.90, 8, TRUE),
-    (9, 5, 'Garrafa Térmica', 'GARRAFA-750', 79.90, 20, TRUE),
-    (10, 4, 'Luminária LED', 'LUMI-LED-001', 129.90, 23, TRUE),
-    (11, 3, 'Livro: PostgreSQL para Devs', 'BOOK-PG-001', 119.90, 16, TRUE),
-    (12, 2, 'Carregador USB-C', 'CARREG-USB-C', 99.90, 35, TRUE),
-    (13, 5, 'Tapete de Yoga', 'YOGA-MAT-001', 149.90, 15, TRUE),
-    (14, 2, 'Hub USB-C', 'HUB-USBC-001', 189.90, 10, TRUE);
 
-INSERT INTO clientes (id, nome, email, telefone, ativo) VALUES
-    (1, 'Ana Beatriz Souza', 'ana.souza@example.com', '(11) 99911-1001', TRUE),
-    (2, 'Bruno Dias', 'bruno.dias@example.com', '(21) 99922-1002', TRUE),
-    (3, 'Camila Rocha', 'camila.rocha@example.com', '(31) 99933-1003', TRUE),
-    (4, 'Daniel Freitas', 'daniel.freitas@example.com', '(41) 99944-1004', TRUE),
-    (5, 'Elisa Santos', 'elisa.santos@example.com', '(51) 99955-1005', TRUE),
-    (6, 'Felipe Martins', 'felipe.martins@example.com', '(61) 99966-1006', TRUE),
-    (7, 'Gabriela Lima', 'gabriela.lima@example.com', '(71) 99977-1007', TRUE),
-    (8, 'Henrique Alves', 'henrique.alves@example.com', '(81) 99988-1008', TRUE);
+-- ============================================================================
+-- 2. TIPOS DE QUARTO
+-- ============================================================================
 
-INSERT INTO enderecos (
-    id, cliente_id, apelido, logradouro, numero, complemento,
-    bairro, cidade, estado, cep, principal
+INSERT INTO tipos_quartos (id, nome, descricao) VALUES
+(1, 'Individual', 'Quarto para uma pessoa, ideal para estadias individuais.'),
+(2, 'Duplo', 'Quarto confortável para até duas pessoas.'),
+(3, 'Triplo', 'Quarto amplo para até três pessoas.'),
+(4, 'Suíte', 'Suíte com ambiente amplo e maior conforto.');
+
+
+-- ============================================================================
+-- 3. QUARTOS
+-- ============================================================================
+
+INSERT INTO quartos (
+    id,
+    numero,
+    tipos_quartos_id,
+    capacidade,
+    valor_diaria,
+    situacao
 ) VALUES
-    (1, 1, 'Casa', 'Rua das Flores', '120', 'Apto 42', 'Jardins', 'São Paulo', 'SP', '01430-001', TRUE),
-    (2, 1, 'Trabalho', 'Avenida Paulista', '900', 'Sala 1203', 'Bela Vista', 'São Paulo', 'SP', '01310-100', FALSE),
-    (3, 2, 'Casa', 'Rua do Ouvidor', '88', NULL, 'Centro', 'Rio de Janeiro', 'RJ', '20040-030', TRUE),
-    (4, 3, 'Casa', 'Avenida Afonso Pena', '1450', 'Apto 702', 'Centro', 'Belo Horizonte', 'MG', '30130-000', TRUE),
-    (5, 4, 'Casa', 'Rua XV de Novembro', '250', NULL, 'Centro', 'Curitiba', 'PR', '80020-310', TRUE),
-    (6, 5, 'Casa', 'Rua dos Andradas', '710', 'Apto 21', 'Centro Histórico', 'Porto Alegre', 'RS', '90020-005', TRUE),
-    (7, 6, 'Casa', 'SQS 210', 'Bloco B', 'Apto 304', 'Asa Sul', 'Brasília', 'DF', '70273-020', TRUE),
-    (8, 7, 'Casa', 'Rua Chile', '450', NULL, 'Comércio', 'Salvador', 'BA', '40020-000', TRUE),
-    (9, 8, 'Casa', 'Rua do Sol', '55', NULL, 'Boa Vista', 'Recife', 'PE', '50060-080', TRUE);
+(1, 101, 1, 1, 180.00, 'Disponível'),
+(2, 102, 1, 1, 190.00, 'Disponível'),
+(3, 201, 2, 2, 280.00, 'Disponível'),
+(4, 202, 2, 2, 300.00, 'Disponível'),
+(5, 301, 3, 3, 380.00, 'Disponível'),
+(6, 302, 3, 3, 400.00, 'Manutenção'),
+(7, 401, 4, 4, 550.00, 'Disponível'),
+(8, 402, 4, 4, 600.00, 'Disponível');
 
-INSERT INTO pedidos (id, cliente_id, endereco_id, status, total, criado_em, atualizado_em) VALUES
-    (1, 1, 1, 'pago',      399.80, '2026-01-05 10:15:00-03', '2026-01-05 10:16:00-03'),
-    (2, 2, 3, 'pago',      209.80, '2026-01-06 14:20:00-03', '2026-01-06 14:22:00-03'),
-    (3, 3, 4, 'pendente',  249.80, '2026-01-08 09:30:00-03', '2026-01-08 09:30:00-03'),
-    (4, 1, 2, 'pago',      899.90, '2026-01-10 16:45:00-03', '2026-01-10 16:47:00-03'),
-    (5, 4, 5, 'enviado',   309.80, '2026-01-11 11:05:00-03', '2026-01-12 08:00:00-03'),
-    (6, 5, 6, 'cancelado', 119.90, '2026-01-12 15:10:00-03', '2026-01-12 15:30:00-03'),
-    (7, 6, 7, 'pago',      539.80, '2026-01-13 18:40:00-03', '2026-01-13 18:42:00-03'),
-    (8, 2, 3, 'pago',      319.60, '2026-01-14 12:25:00-03', '2026-01-14 12:26:00-03'),
-    (9, 7, 8, 'pendente',  279.80, '2026-01-15 10:10:00-03', '2026-01-15 10:10:00-03'),
-    (10, 3, 4, 'pago',     359.70, '2026-01-16 13:55:00-03', '2026-01-16 13:57:00-03'),
-    (11, 4, 5, 'pago',     289.80, '2026-01-18 17:20:00-03', '2026-01-18 17:22:00-03'),
-    (12, 6, 7, 'entregue', 599.80, '2026-01-20 09:00:00-03', '2026-01-22 11:00:00-03');
 
-INSERT INTO itens_pedido (id, pedido_id, produto_id, quantidade, preco_unitario) VALUES
-    (1, 1, 1, 1, 299.90),
-    (2, 1, 12, 1, 99.90),
-    (3, 2, 3, 1, 119.90),
-    (4, 2, 5, 1, 89.90),
-    (5, 3, 10, 1, 129.90),
-    (6, 3, 11, 1, 119.90),
-    (7, 4, 8, 1, 899.90),
-    (8, 5, 6, 1, 159.90),
-    (9, 5, 13, 1, 149.90),
-    (10, 6, 11, 1, 119.90),
-    (11, 7, 2, 1, 349.90),
-    (12, 7, 14, 1, 189.90),
-    (13, 8, 9, 4, 79.90),
-    (14, 9, 10, 1, 129.90),
-    (15, 9, 13, 1, 149.90),
-    (16, 10, 3, 3, 119.90),
-    (17, 11, 12, 1, 99.90),
-    (18, 11, 14, 1, 189.90),
-    (19, 12, 1, 2, 299.90);
+-- ============================================================================
+-- 4. RESERVAS
+-- ============================================================================
 
--- Atualiza as sequências depois dos INSERTs explícitos.
-SELECT setval('categorias_id_seq', (SELECT MAX(id) FROM categorias));
-SELECT setval('produtos_id_seq', (SELECT MAX(id) FROM produtos));
-SELECT setval('clientes_id_seq', (SELECT MAX(id) FROM clientes));
-SELECT setval('enderecos_id_seq', (SELECT MAX(id) FROM enderecos));
-SELECT setval('pedidos_id_seq', (SELECT MAX(id) FROM pedidos));
-SELECT setval('itens_pedido_id_seq', (SELECT MAX(id) FROM itens_pedido));
+INSERT INTO reservas (
+    id,
+    hospedes_id,
+    quartos_id,
+    data_entrada,
+    data_saida,
+    qtd_hospedes,
+    situacao,
+    observacao
+) VALUES
+
+-- Reservas finalizadas
+(1, 1, 1, '2026-01-10', '2026-01-13', 1, 'Finalizado',
+ 'Hospedagem de três noites.'),
+
+(2, 2, 3, '2026-01-15', '2026-01-19', 2, 'Finalizado',
+ 'Hóspede solicitou quarto silencioso.'),
+
+(3, 3, 5, '2026-02-05', '2026-02-10', 3, 'Finalizado',
+ 'Família em viagem de férias.'),
+
+(4, 1, 4, '2026-02-20', '2026-02-23', 2, 'Finalizado',
+ 'Segunda hospedagem do hóspede.'),
+
+(5, 4, 7, '2026-03-01', '2026-03-05', 2, 'Finalizado',
+ 'Suíte para viagem de lazer.'),
+
+(6, 5, 2, '2026-03-10', '2026-03-12', 1, 'Finalizado',
+ 'Viagem a trabalho.'),
+
+-- Reservas hospedadas
+(7, 6, 3, '2026-08-15', '2026-08-20', 2, 'Hospedado',
+ 'Hóspede em viagem de trabalho.'),
+
+(8, 7, 5, '2026-08-17', '2026-08-22', 3, 'Hospedado',
+ 'Viagem em família.'),
+
+-- Reservas futuras
+(9, 8, 7, '2026-09-05', '2026-09-10', 2, 'Reservado',
+ 'Reserva para feriado.'),
+
+(10, 9, 4, '2026-09-12', '2026-09-15', 2, 'Reservado',
+ 'Final de semana prolongado.'),
+
+(11, 10, 1, '2026-10-01', '2026-10-04', 1, 'Reservado',
+ 'Viagem de negócios.'),
+
+(12, 2, 8, '2026-10-10', '2026-10-15', 4, 'Reservado',
+ 'Família em viagem.'),
+
+-- Mais uma reserva futura para um hóspede que já possui reserva
+(13, 3, 3, '2026-11-05', '2026-11-08', 2, 'Reservado',
+ 'Nova hospedagem do hóspede.'),
+
+-- Reservas canceladas
+(14, 4, 2, '2026-07-10', '2026-07-13', 1, 'Cancelado',
+ 'Reserva cancelada pelo hóspede.'),
+
+(15, 6, 4, '2026-07-20', '2026-07-25', 2, 'Cancelado',
+ 'Cancelamento por alteração de viagem.');
+
+
+-- ============================================================================
+-- 5. SERVIÇOS
+-- ============================================================================
+
+INSERT INTO servicos (
+    id,
+    nome,
+    descricao,
+    preco,
+    ativo
+) VALUES
+(1, 'Café da manhã', 
+ 'Café da manhã completo servido na pousada.', 
+ 35.00, TRUE),
+
+(2, 'Estacionamento', 
+ 'Vaga de estacionamento para um veículo.', 
+ 25.00, TRUE),
+
+(3, 'Lavanderia', 
+ 'Serviço de lavagem e secagem de roupas.', 
+ 45.00, TRUE),
+
+(4, 'Traslado', 
+ 'Traslado entre a pousada e o aeroporto.', 
+ 120.00, TRUE),
+
+(5, 'Passeio turístico', 
+ 'Passeio turístico guiado pela região.', 
+ 180.00, TRUE),
+
+(6, 'Serviço de quarto', 
+ 'Atendimento e alimentação no quarto.', 
+ 60.00, TRUE);
+
+
+-- ============================================================================
+-- 6. SERVIÇOS UTILIZADOS NAS RESERVAS
+-- ============================================================================
+
+INSERT INTO servicos_da_reserva (
+    id,
+    reservas_id,
+    servicos_id,
+    quantidade
+) VALUES
+
+-- Reserva 1
+(1, 1, 1, 3),
+(2, 1, 2, 3),
+
+-- Reserva 2
+(3, 2, 1, 4),
+(4, 2, 2, 4),
+(5, 2, 6, 2),
+
+-- Reserva 3
+(6, 3, 1, 5),
+(7, 3, 2, 5),
+(8, 3, 5, 1),
+
+-- Reserva 4
+(9, 4, 1, 3),
+(10, 4, 4, 1),
+
+-- Reserva 5
+(11, 5, 1, 4),
+(12, 5, 5, 2),
+(13, 5, 6, 1),
+
+-- Reserva 6
+(14, 6, 1, 2),
+(15, 6, 3, 1),
+
+-- Reserva 7
+(16, 7, 1, 5),
+(17, 7, 2, 5),
+(18, 7, 3, 2),
+
+-- Reserva 8
+(19, 8, 1, 5),
+(20, 8, 5, 1),
+(21, 8, 6, 2),
+
+-- Reserva 9
+(22, 9, 1, 5),
+(23, 9, 4, 1),
+
+-- Reserva 10
+(24, 10, 1, 3),
+(25, 10, 2, 3),
+
+-- Reserva 11
+(26, 11, 1, 3),
+
+-- Reserva 12
+(27, 12, 1, 5),
+(28, 12, 2, 5),
+(29, 12, 5, 1),
+
+-- Reserva 13
+(30, 13, 1, 3),
+(31, 13, 6, 2);
+
+
+-- ============================================================================
+-- 7. PAGAMENTOS
+-- ============================================================================
+
+INSERT INTO pagamentos (
+    id,
+    reservas_id,
+    valor,
+    data_pagamento,
+    forma_pagamento,
+    situacao
+) VALUES
+
+-- Reserva 1
+(1, 1, 540.00, '2026-01-10', 'Pix', 'Pago'),
+
+-- Reserva 2
+(2, 2, 1120.00, '2026-01-15', 'Cartão de crédito', 'Pago'),
+
+-- Reserva 3
+(3, 3, 1900.00, '2026-02-05', 'Cartão de débito', 'Pago'),
+
+-- Reserva 4
+(4, 4, 900.00, '2026-02-20', 'Pix', 'Pago'),
+
+-- Reserva 5
+(5, 5, 2200.00, '2026-03-01', 'Cartão de crédito', 'Pago'),
+
+-- Reserva 6
+(6, 6, 380.00, '2026-03-10', 'Dinheiro', 'Pago'),
+
+-- Reserva 7
+(7, 7, 1000.00, '2026-08-15', 'Pix', 'Pago'),
+
+(8, 7, 300.00, '2026-08-17', 'Cartão de crédito', 'Pago'),
+
+-- Reserva 8
+(9, 8, 1200.00, '2026-08-17', 'Cartão de débito', 'Pago'),
+
+-- Reserva 9
+(10, 9, 1000.00, '2026-08-01', 'Pix', 'Pago'),
+
+(11, 9, 200.00, '2026-08-20', 'Pix', 'Pendente'),
+
+-- Reserva 10
+(12, 10, 900.00, '2026-08-10', 'Cartão de crédito', 'Pago'),
+
+-- Reserva 11
+(13, 11, 540.00, '2026-09-20', 'Pix', 'Pendente'),
+
+-- Reserva 12
+(14, 12, 1800.00, '2026-09-25', 'Cartão de crédito', 'Pendente'),
+
+-- Reserva 13
+(15, 13, 840.00, '2026-10-20', 'Pix', 'Pendente');
+
+
+-- ============================================================================
+-- 8. AJUSTE DAS SEQUÊNCIAS DOS BIGSERIAL
+-- ============================================================================
+
+SELECT setval(
+    pg_get_serial_sequence('hospedes', 'id'),
+    (SELECT MAX(id) FROM hospedes)
+);
+
+SELECT setval(
+    pg_get_serial_sequence('tipos_quartos', 'id'),
+    (SELECT MAX(id) FROM tipos_quartos)
+);
+
+SELECT setval(
+    pg_get_serial_sequence('quartos', 'id'),
+    (SELECT MAX(id) FROM quartos)
+);
+
+SELECT setval(
+    pg_get_serial_sequence('reservas', 'id'),
+    (SELECT MAX(id) FROM reservas)
+);
+
+SELECT setval(
+    pg_get_serial_sequence('servicos', 'id'),
+    (SELECT MAX(id) FROM servicos)
+);
+
+SELECT setval(
+    pg_get_serial_sequence('servicos_da_reserva', 'id'),
+    (SELECT MAX(id) FROM servicos_da_reserva)
+);
+
+SELECT setval(
+    pg_get_serial_sequence('pagamentos', 'id'),
+    (SELECT MAX(id) FROM pagamentos)
+);
 
 COMMIT;
-

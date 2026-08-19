@@ -18,155 +18,120 @@ CREATE TABLE hospedes (
     telefone VARCHAR(20),
     email VARCHAR(255),
     criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
-)
+);
 
-CREATE TABLE tiposQuartos (
+CREATE TABLE tipos_quartos (
     id BIGSERIAL PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
     descricao TEXT
-)
+);
 
 CREATE TABLE quartos (
     id BIGSERIAL PRIMARY KEY,
-    numero BIGINT NOT NULL,
-    tipoQuarto_id BIGINT NOT NULL,
+    numero BIGINT NOT NULL UNIQUE,
+    tipos_quartos_id BIGINT NOT NULL,
     capacidade SMALLINT NOT NULL,
-    valorDiaria DECIMAL NOT NULL,
+    valor_diaria NUMERIC(10,2) NOT NULL,
     situacao VARCHAR(30) NOT NULL DEFAULT 'Disponível',
     
-    CONSTRAINT fk_quartos_tiposQuartos
-        FOREIGN KEY (tipoQuarto_id)
-        REFERENCES tiposQuartos (id)
+    CONSTRAINT fk_quartos_tipos_quartos
+        FOREIGN KEY (tipos_quartos_id)
+        REFERENCES tipos_quartos (id)
         ON DELETE RESTRICT,
     CONSTRAINT ck_quartos_situacao
-        CHECK (situacao IN ('Disponível', 'Ocupado', 'Manutenção', 'Inativo')),
-)
+        CHECK (situacao IN ('Disponível', 'Manutenção', 'Inativo')),
+    CONSTRAINT ck_quartos_capacidade
+        CHECK (capacidade > 0),
+    CONSTRAINT ck_quartos_valor_diaria
+        CHECK (valor_diaria >= 0)
+);
 
-CREATE TABLE reserva (
+CREATE TABLE reservas (
     id BIGSERIAL PRIMARY KEY,
     hospedes_id BIGINT NOT NULL,
     quartos_id BIGINT NOT NULL,
-    dataEntrada 
-)
+    data_entrada DATE NOT NULL,
+    data_saida DATE NOT NULL,
+    qtd_hospedes BIGINT NOT NULL,
+    situacao VARCHAR(30) NOT NULL DEFAULT 'Reservado',
+    observacao TEXT,
 
+    CONSTRAINT fk_reservas_hospedes
+        FOREIGN KEY (hospedes_id)
+        REFERENCES hospedes (id)
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_reservas_quartos
+        FOREIGN KEY (quartos_id)
+        REFERENCES quartos (id)
+        ON DELETE RESTRICT,
+    CONSTRAINT ck_reservas_situacao
+        CHECK (situacao IN ('Reservado', 'Hospedado', 'Finalizado', 'Cancelado')),
+    CONSTRAINT ck_reservas_qtd_hospedes
+        CHECK (qtd_hospedes > 0),
+    CONSTRAINT ck_reservas_datas
+        CHECK (data_saida > data_entrada)
+);
 
 CREATE TABLE servicos (
     id BIGSERIAL PRIMARY KEY,
     nome VARCHAR(150) NOT NULL,
     descricao TEXT,
     preco NUMERIC(10, 2) NOT NULL,
-    ativo BOOLEAN NOT NULL DEFAULT TRUE
-)
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+
+    CONSTRAINT ck_servicos_preco
+    CHECK (preco >= 0)
+);
+
+CREATE TABLE servicos_da_reserva (
+    id BIGSERIAL PRIMARY KEY,
+    reservas_id BIGINT NOT NULL,
+    servicos_id BIGINT NOT NULL,
+    quantidade BIGINT NOT NULL DEFAULT 1,
+
+    CONSTRAINT fk_servicos_da_reserva_reservas
+        FOREIGN KEY (reservas_id)
+        REFERENCES reservas (id)
+        ON DELETE RESTRICT,    
+    CONSTRAINT fk_servicos_da_reserva_servicos
+        FOREIGN KEY (servicos_id)
+        REFERENCES servicos (id)
+        ON DELETE RESTRICT,
+    CONSTRAINT ck_servicos_da_reserva_quantidade
+        CHECK (quantidade > 0),
+    CONSTRAINT uq_servicos_da_reserva
+        UNIQUE (reservas_id, servicos_id)
+);
 
 CREATE TABLE pagamentos (
     id BIGSERIAL PRIMARY KEY,
+    reservas_id BIGINT NOT NULL,
+    valor NUMERIC(10,2) NOT NULL,
+    data_pagamento DATE NOT NULL,
+    forma_pagamento VARCHAR(30) NOT NULL,
+    situacao VARCHAR(30) NOT NULL DEFAULT 'Pendente',
 
-)
-
-
-
-
-
-
-
-
-
-
-CREATE TABLE categorias (
-    id BIGSERIAL PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL UNIQUE,
-    descricao TEXT,
-    criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE TABLE produtos (
-    id BIGSERIAL PRIMARY KEY,
-    categoria_id BIGINT NOT NULL,
-    nome VARCHAR(200) NOT NULL,
-    sku VARCHAR(30) NOT NULL UNIQUE,
-    preco NUMERIC(10, 2) NOT NULL CHECK (preco > 0),
-    estoque INTEGER NOT NULL DEFAULT 0 CHECK (estoque >= 0),
-    ativo BOOLEAN NOT NULL DEFAULT TRUE,
-    criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-
-    CONSTRAINT fk_produtos_categoria
-        FOREIGN KEY (categoria_id)
-        REFERENCES categorias (id)
-        ON DELETE RESTRICT
-);
-
-CREATE TABLE clientes (
-    id BIGSERIAL PRIMARY KEY,
-    nome VARCHAR(150) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    telefone VARCHAR(20),
-    ativo BOOLEAN NOT NULL DEFAULT TRUE,
-    criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE TABLE enderecos (
-    id BIGSERIAL PRIMARY KEY,
-    cliente_id BIGINT NOT NULL,
-    apelido VARCHAR(50) NOT NULL DEFAULT 'Principal',
-    logradouro VARCHAR(180) NOT NULL,
-    numero VARCHAR(20) NOT NULL,
-    complemento VARCHAR(80),
-    bairro VARCHAR(100) NOT NULL,
-    cidade VARCHAR(100) NOT NULL,
-    estado CHAR(2) NOT NULL,
-    cep VARCHAR(10) NOT NULL,
-    principal BOOLEAN NOT NULL DEFAULT FALSE,
-
-    CONSTRAINT fk_enderecos_cliente
-        FOREIGN KEY (cliente_id)
-        REFERENCES clientes (id)
-        ON DELETE CASCADE
-);
-
-CREATE TABLE pedidos (
-    id BIGSERIAL PRIMARY KEY,
-    cliente_id BIGINT NOT NULL,
-    endereco_id BIGINT,
-    status VARCHAR(20) NOT NULL DEFAULT 'pendente',
-    total NUMERIC(10, 2) NOT NULL DEFAULT 0 CHECK (total >= 0),
-    criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-
-    CONSTRAINT ck_pedidos_status
-        CHECK (status IN ('pendente', 'pago', 'enviado', 'entregue', 'cancelado')),
-    CONSTRAINT fk_pedidos_cliente
-        FOREIGN KEY (cliente_id)
-        REFERENCES clientes (id)
+    CONSTRAINT fk_pagamentos_reservas
+        FOREIGN KEY (reservas_id)
+        REFERENCES reservas (id)
         ON DELETE RESTRICT,
-    CONSTRAINT fk_pedidos_endereco
-        FOREIGN KEY (endereco_id)
-        REFERENCES enderecos (id)
-        ON DELETE SET NULL
+    CONSTRAINT ck_pagamentos_forma_pagamento
+        CHECK (forma_pagamento IN ('Dinheiro', 'Cartão de crédito', 'Cartão de débito', 'Pix')),
+    CONSTRAINT ck_pagamentos_situacao
+        CHECK (situacao IN ('Pendente', 'Pago')),
+    CONSTRAINT ck_pagamentos_valor
+        CHECK (valor > 0)
 );
 
-CREATE TABLE itens_pedido (
-    id BIGSERIAL PRIMARY KEY,
-    pedido_id BIGINT NOT NULL,
-    produto_id BIGINT NOT NULL,
-    quantidade INTEGER NOT NULL CHECK (quantidade > 0),
-    preco_unitario NUMERIC(10, 2) NOT NULL CHECK (preco_unitario >= 0),
 
-    CONSTRAINT uq_itens_pedido_produto
-        UNIQUE (pedido_id, produto_id),
-    CONSTRAINT fk_itens_pedido_pedido
-        FOREIGN KEY (pedido_id)
-        REFERENCES pedidos (id)
-        ON DELETE CASCADE,
-    CONSTRAINT fk_itens_pedido_produto
-        FOREIGN KEY (produto_id)
-        REFERENCES produtos (id)
-        ON DELETE RESTRICT
-);
+CREATE EXTENSION IF NOT EXISTS btree_gist;
 
--- Índices para consultas realizadas na aula.
-CREATE INDEX idx_produtos_categoria ON produtos (categoria_id);
-CREATE INDEX idx_enderecos_cliente ON enderecos (cliente_id);
-CREATE INDEX idx_pedidos_cliente_status ON pedidos (cliente_id, status);
-CREATE INDEX idx_pedidos_status_criado_em ON pedidos (status, criado_em DESC);
-CREATE INDEX idx_itens_pedido_pedido ON itens_pedido (pedido_id);
-CREATE INDEX idx_itens_pedido_produto ON itens_pedido (produto_id);
+    ALTER TABLE reservas
+    ADD CONSTRAINT reservas_sem_conflito
+    EXCLUDE USING GIST (
+        quartos_id WITH =,
+        daterange(data_entrada, data_saida, '[)') WITH &&
+    )
+    WHERE (situacao <> 'Cancelado');
+
+COMMIT;
