@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Author;
 
 class AuthorController extends Controller
 {
@@ -56,6 +57,7 @@ class AuthorController extends Controller
      */
     public function edit(string $id)
     {
+        $author = Author::findOrFail($id);
         return view('authors.edit', compact('author'));
     }
 
@@ -64,6 +66,8 @@ class AuthorController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $author = Author::findOrFail($id);
+    
         $request->validate([
             'nome' => 'required|string|max:255',
             'nacionalidade' => 'required|string|max:255',
@@ -84,6 +88,7 @@ class AuthorController extends Controller
      */
     public function destroy(string $id)
     {
+        $author = Author::findOrFail($id);
         $author->delete();
 
         return redirect()->route('authors.index');
