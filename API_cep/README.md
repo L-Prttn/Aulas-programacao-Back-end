@@ -23,7 +23,7 @@ Exercício do Programa Futuro Digital (IFRS - Back End, 3º Ciclo, Caxias do Sul
 ## 1. Baixar o projeto
 
 ```bash
-git clone https://github.com/SEU_USUARIO/API_cep.git
+git clone https://github.com/L-Prttn/Aulas-programacao-Back-end/tree/2ef139e60e6be6cfdc0d9d8e281c59b7aa6c45b4/API_cep
 cd API_cep
 ```
 
